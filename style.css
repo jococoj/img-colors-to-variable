@@ -1,0 +1,27 @@
+body { font-family: Inter, system-ui, sans-serif; margin: 0; padding: 20px; color:#111; background:#f7f7f9; }
+h1 { margin-top:0; }
+.layout { display:grid; grid-template-columns: minmax(360px, 1.7fr) minmax(320px, 1fr); gap: 16px; }
+.u-card { background:white; border:1px solid #d9d9db; border-radius:10px; padding: 14px; }
+.u-row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+input, select, button, textarea { font: inherit; }
+.image-area { position:relative; border: 1px solid #aaa; border-radius: 8px; background:#eee; min-height: 340px; display:flex; justify-content:center; align-items:center; }
+.image-area img { max-width:100%; max-height:100%; border-radius: 8px; }
+.picker { position:absolute; width:40px; height:40px; border-radius:50%; border:3px solid rgba(255,255,255,0.9); box-shadow:0 0 0 2px rgba(0,0,0,.25); pointer-events:none; transform:translate(-50%, -50%); display:flex; justify-content:center; align-items:center; }
+.picker::after { content:'+'; color:#222; font-weight:800; font-size:18px; }
+.marker { position:absolute; width:16px; height:16px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 2px rgba(0,0,0,.35); transform:translate(-50%, -50%); cursor:grab; }
+.marker.dragging { cursor:grabbing; }
+table { width:100%; border-collapse:collapse; margin-top:8px; }
+th, td { padding:6px 8px; border-bottom:1px solid #eee; text-align:left; }
+.swatch { width:26px; height:26px; border-radius:100%; border:1px solid #aaa; display:inline-block; }
+.underlined { border:none; border-bottom:1px solid #666; padding:2px 4px; width:100%; background:transparent; }
+.code-box { width:100%; min-height:150px; margin-top:12px; border:1px solid #ccc; background:#fafafa; border-radius:6px; padding:10px; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; white-space:pre-wrap; overflow:auto; }
+.hidden { display:none; }
+.label-inline { font-size:0.9rem; margin-right:6px; font-weight:600; }
+.control-grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; align-items:center; }
+.btn { cursor:pointer; border-radius:6px; border:1px solid #888; background:#fff; color:#222; padding:8px 12px; }
+.btn:hover { background: #f0f0f2; }
+.danger { border-color:#d44; color:#a00; }
+.danger:hover { background:#ffe5e5; }
+.format-btn { border:1px solid #999; background:#fbfbfc; }
+.format-btn.active { background:#6aa8ff; color:#fff; border-color:#3b7be4; }
+.topline { font-size:0.95rem; color:#333; margin-bottom:6px; }

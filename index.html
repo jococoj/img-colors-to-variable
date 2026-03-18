@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manual Image Color-to-CSS-Variable Picker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Image Color Picker → CSS Variables</h1>
+
+  <div class="layout">
+    <div class="u-card" style="display:flex; flex-direction:column; gap:12px;">
+      <div class="u-row">
+        <label class="label-inline" for="uploadInput">Upload image</label>
+        <input id="uploadInput" type="file" accept="image/*" />
+        <button id="resetButton" class="btn">Reset</button>
+      </div>
+      <div id="imageContainer" class="image-area">
+        <img id="previewImg" class="hidden" alt="Uploaded image" />
+        <div id="picker" class="picker hidden"></div>
+      </div>
+      <div class="u-row" style="justify-content:space-between;">
+        <button id="addCurrentBtn" class="btn">Add picked color</button>
+        <span id="pickedValue" class="topline">No pick yet</span>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div class="u-card">
+        <div class="topline">Color format</div>
+        <div class="u-row">
+          <button class="btn format-btn active" data-format="rgb" id="fmtRGB">RGB</button>
+          <button class="btn format-btn" data-format="hex" id="fmtHEX">HEX</button>
+          <button class="btn format-btn" data-format="hsl" id="fmtHSL">HSL</button>
+          <button class="btn format-btn" data-format="rgbSpace" id="fmtRGBSpace">rgb r g b</button>
+          <button class="btn format-btn" data-format="values" id="fmtValues">values</button>
+        </div>
+        <div class="topline" style="margin-top:10px;">Variable format</div>
+        <div class="control-grid">
+          <div>
+            <label class="label-inline" for="prefixInput">Prefix</label>
+            <input id="prefixInput" type="text" value="theme-color-" />
+          </div>
+          <div>
+            <label class="label-inline" for="suffixInput">Suffix</label>
+            <input id="suffixInput" type="text" value="" />
+          </div>
+        </div>
+      </div>
+
+      <div class="u-card">
+        <div class="topline">Picked colors list</div>
+        <table id="colorTable">
+          <thead>
+            <tr><th>Color</th><th>#</th><th>Value</th><th>Remove</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="u-card">
+        <div class="u-row" style="justify-content:space-between;">
+          <strong>Generated CSS variables</strong>
+          <button id="copyBtn" class="btn">Copy all</button>
+        </div>
+        <div id="codeBox" class="code-box"></div>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="sampleCanvas" class="hidden"></canvas>
+  <script src="script.js"></script>
+</body>
+</html>
