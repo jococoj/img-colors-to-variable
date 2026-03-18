@@ -209,9 +209,17 @@
 
   function setPickerAt() { return; }
 
+  function removeAllMarkers() {
+    colorItems.forEach(item => { if (item.marker) item.marker.remove(); });
+    colorItems = [];
+    colorTableBody.innerHTML = '';
+    updateCodeOutput();
+  }
+
   upload.addEventListener('change', event => {
     const file = event.target.files?.[0];
     if (!file) return;
+    removeAllMarkers();
     const url = URL.createObjectURL(file);
     previewImg.src = url;
     previewImg.classList.remove('hidden');
@@ -228,9 +236,7 @@
     previewImg.classList.add('hidden');
     currentPick = null;
     draggingMarker = null;
-    colorItems.forEach(item => { if (item.marker) item.marker.remove(); });
-    colorItems = [];
-    colorTableBody.innerHTML = '';
+    removeAllMarkers();
     codeBox.textContent = '';
     pickedValue.textContent = 'No pick yet';
     pickedValue.style.color = 'inherit';
