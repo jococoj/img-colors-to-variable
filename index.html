@@ -33,8 +33,8 @@
           <button class="btn format-btn active" data-format="rgb" id="fmtRGB">RGB</button>
           <button class="btn format-btn" data-format="hex" id="fmtHEX">HEX</button>
           <button class="btn format-btn" data-format="hsl" id="fmtHSL">HSL</button>
-          <button class="btn format-btn" data-format="rgbSpace" id="fmtRGBSpace">rgb r g b</button>
-          <button class="btn format-btn" data-format="values" id="fmtValues">values</button>
+          <button class="btn format-btn" data-format="rgba" id="fmtRGBA">RGBA</button>
+          <button class="btn format-btn" data-format="values" id="fmtRGBChannels">RGB channels</button>
         </div>
         <div class="topline" style="margin-top:10px;">Variable format</div>
         <div class="control-grid">
@@ -60,8 +60,15 @@
       </div>
 
       <div class="u-card">
-        <div class="u-row" style="justify-content:space-between;">
-          <strong>Generated CSS variables</strong>
+        <div class="u-row" style="justify-content:space-between; align-items:center;">
+          <div style="display:flex; gap:12px; align-items:center;">
+            <strong>Generated CSS variables</strong>
+            <label style="font-size:0.82rem; color:#64748B; white-space:nowrap;">Format</label>
+            <div class="var-type-buttons">
+              <button class="btn var-type-btn active" data-var-type="css" id="varTypeCss">CSS</button>
+              <button class="btn var-type-btn" data-var-type="scss" id="varTypeScss">SCSS</button>
+            </div>
+          </div>
           <button id="copyBtn" class="btn">Copy all</button>
         </div>
         <div id="codeBox" class="code-box"></div>

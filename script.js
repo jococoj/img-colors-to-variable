@@ -6,6 +6,7 @@
   const sampleCanvas = document.getElementById('sampleCanvas');
   const prefixInput = document.getElementById('prefixInput');
   const suffixInput = document.getElementById('suffixInput');
+  const varTypeButtons = Array.from(document.querySelectorAll('.var-type-btn'));
   const colorTableBody = document.querySelector('#colorTable tbody');
   const codeBox = document.getElementById('codeBox');
   const copyBtn = document.getElementById('copyBtn');
@@ -17,6 +18,7 @@
   let dragging = false;
   let draggingMarker = null;
   let currentFormat = 'rgb';
+  let currentVarType = 'css';
   let colorItems = [];
 
   const clamp = (v,mn,mx)=> Math.min(mx,Math.max(mn,v));
@@ -33,6 +35,35 @@
     return { px, py, ix, iy };
   }
 
+  function getImageMetrics() {
+    const imgRect = previewImg.getBoundingClientRect();
+    const containerRect = imageContainer.getBoundingClientRect();
+    const offsetX = imgRect.left - containerRect.left;
+    const offsetY = imgRect.top - containerRect.top;
+    return { imgRect, containerRect, offsetX, offsetY };
+  }
+
+  function positionFromIndex(ix, iy) {
+    const nW = previewImg.naturalWidth || 1;
+    const nH = previewImg.naturalHeight || 1;
+    return positionFromFraction(ix / nW, iy / nH);
+  }
+
+  function positionFromFraction(fx, fy) {
+    const { imgRect, offsetX, offsetY } = getImageMetrics();
+    if (!imgRect.width || !imgRect.height) return { left: 0, top: 0 };
+    const left = offsetX + fx * imgRect.width;
+    const top = offsetY + fy * imgRect.height;
+    return { left, top };
+  }
+
+  function updateMarkerPosition(item) {
+    if (!item.marker) return;
+    const p = positionFromIndex(item.ix, item.iy);
+    item.marker.style.left = `${Math.round(p.left)}px`;
+    item.marker.style.top = `${Math.round(p.top)}px`;
+  }
+
   function sampleColor(ix, iy) {
     const ctx = sampleCanvas.getContext('2d');
     sampleCanvas.width = 1;
@@ -45,10 +76,16 @@
   function createMarker(item) {
     const marker = document.createElement('div');
     marker.className = 'marker';
-    marker.style.left = `${item.x}px`;
-    marker.style.top = `${item.y}px`;
     marker.style.backgroundColor = formatColor(item.raw);
     imageContainer.appendChild(marker);
+
+    if (typeof item.px === 'number' && typeof item.py === 'number') {
+      const { offsetX, offsetY } = getImageMetrics();
+      marker.style.left = `${Math.round(offsetX + item.px)}px`;
+      marker.style.top = `${Math.round(offsetY + item.py)}px`;
+    }
+
+    requestAnimationFrame(() => updateMarkerPosition(item));
 
     marker.addEventListener('pointerdown', event => {
       event.stopPropagation();
@@ -73,11 +110,10 @@
     if (!draggingMarker) return;
     const pos = toNaturalPoint(clientX, clientY);
     if (!pos) return;
-    const { px, py, ix, iy } = pos;
-    draggingMarker.x = px;
-    draggingMarker.y = py;
-    draggingMarker.marker.style.left = `${px}px`;
-    draggingMarker.marker.style.top = `${py}px`;
+    const { ix, iy } = pos;
+    draggingMarker.ix = ix;
+    draggingMarker.iy = iy;
+    updateMarkerPosition(draggingMarker);
 
     if (!draggingMarker.isManual) {
       draggingMarker.raw = sampleColor(ix, iy);
@@ -89,9 +125,9 @@
     pickedValue.style.color = `rgb(${draggingMarker.raw.r}, ${draggingMarker.raw.g}, ${draggingMarker.raw.b})`;
   }
 
-  function addColor(r, g, b, a, x, y) {
+  function addColor(r, g, b, a, ix, iy, px, py) {
     const id = colorItems.length + 1;
-    const itemData = { id, raw: { r, g, b, a }, x, y, isManual: false };
+    const itemData = { id, raw: { r, g, b, a }, ix, iy, px, py, isManual: false };
     const row = makeRow(itemData);
     createMarker(itemData);
     colorTableBody.appendChild(row);
@@ -106,7 +142,7 @@
     const pos = toNaturalPoint(clientX, clientY);
     if (!pos) return;
     const raw = sampleColor(pos.ix, pos.iy);
-    addColor(raw.r, raw.g, raw.b, raw.a, pos.px, pos.py);
+    addColor(raw.r, raw.g, raw.b, raw.a, pos.ix, pos.iy, pos.px, pos.py);
   }
 
   function formatColor(c) {
@@ -125,6 +161,7 @@
     switch (currentFormat) {
       case 'hex': return '#' + toHex(r) + toHex(g) + toHex(b);
       case 'rgb': return `rgb(${r}, ${g}, ${b})`;
+      case 'rgba': return `rgba(${r}, ${g}, ${b}, 1)`;
       case 'rgbSpace': return `rgb ${r} ${g} ${b}`;
       case 'values': return `${r}, ${g}, ${b}`;
       case 'hsl': return `hsl(${Math.round(hue)}, ${Math.round(s*100)}%, ${Math.round((l/255)*100)}%)`;
@@ -138,7 +175,10 @@
     const lines = colorItems.map(item => {
       const idx = item.numberInput.value.trim() || item.id;
       const value = item.rgbInput.value.trim() || formatColor(item.raw);
-      return `--${pre}${idx}${suf}: ${value};`;
+      const varName = currentVarType === 'scss'
+        ? `$${pre}${idx}${suf}`
+        : `--${pre}${idx}${suf}`;
+      return `${varName}: ${value};`;
     });
     codeBox.textContent = lines.join('\n');
   }
@@ -179,6 +219,7 @@
     const removeBtn = document.createElement('button');
     removeBtn.className = 'btn danger';
     removeBtn.textContent = 'Remove';
+    removeBtn.classList.add('remove-btn');
     removeBtn.addEventListener('click', () => {
       colorItems = colorItems.filter(x => x !== itemData);
       if (itemData.marker) itemData.marker.remove();
@@ -202,6 +243,7 @@
       }
       if (item.marker) {
         item.marker.style.backgroundColor = formatColor(item.raw);
+        updateMarkerPosition(item);
       }
     });
     updateCodeOutput();
@@ -227,6 +269,7 @@
       currentPick = null;
       pickedValue.textContent = 'Click image to add selector';
       pickedValue.style.color = 'inherit';
+      refreshRows();
     };
   });
 
@@ -263,6 +306,10 @@
     dragging = false;
   });
 
+  window.addEventListener('resize', () => {
+    refreshRows();
+  });
+
   addCurrentBtn.style.display = 'none';
 
   prefixInput.addEventListener('input', updateCodeOutput);
@@ -274,6 +321,15 @@
       btn.classList.add('active');
       currentFormat = btn.dataset.format;
       refreshRows();
+    });
+  });
+
+  varTypeButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      varTypeButtons.forEach(x => x.classList.remove('active'));
+      btn.classList.add('active');
+      currentVarType = btn.dataset.varType;
+      updateCodeOutput();
     });
   });
 
